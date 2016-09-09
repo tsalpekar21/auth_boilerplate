@@ -1,20 +1,12 @@
 import React from 'react'
-import { loginUser } from '../actions'
 
 class Login extends React.Component {
   constructor(props) {
     super(props)
-    let priorState = props.location.state
-    let errorArray = []
-
-    if (priorState && priorState.expired) {
-      errorArray.push({message: 'Session expired, please login again'})
-    }
 
     this.state = {
       email: '',
-      password: '',
-      errors: errorArray
+      password: ''
     }
   }
 
@@ -26,23 +18,19 @@ class Login extends React.Component {
       email: email,
       password: password
     }
-    loginUser(user, this.props.handleAuthentcation, (err) => { this.setState({ errors: [err.responseJSON] }) })
+    this.props.actionDispatcher.loginUser(user, this.props.handleAuthentication, this.props.handleErrors)
   }     
 
   render() {
     return (
-      <form className="form-signin"> 
-        { this.state.errors.length > 0 && 
-          this.state.errors.map( e => (
-            <div className="alert alert-danger" role="alert"> { e.message } </div>  
-          ))
-        }
-        
-        <h2 className="form-signin-heading">Please sign in</h2>
-        <label className="sr-only">Email address</label>
+      <form className="form-signin well"> 
+        <h2 className="form-signin-heading text-center">Sign In</h2>
+        <label htmlFor="inputEmail">Email address</label>
         <input ref="email" id="inputEmail" className="form-control"  placeholder="Email address" required="" autoComplete="off" />
-        <label className="sr-only">Password</label>
+        <br />
+        <label htmlFor="inputPassword">Password</label>
         <input type="password" id="inputPassword" ref="password" className="form-control" placeholder="Password" required="" autoComplete="off" />
+        <br />
         <button className="btn btn-lg btn-primary btn-block" onClick={(e) => this.handleClick(e)} >Login</button>
       </form>
     );

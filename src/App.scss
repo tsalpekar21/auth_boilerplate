@@ -1,17 +1,5 @@
 $primary-color: 'blue';
 
-.form-signin input[type="email"] {
-    margin-bottom: -1px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
-.form-signin input[type="text"] {
-    margin-bottom: -1px;
-    border-bottom-right-radius: 0;
-    border-bottom-left-radius: 0;
-}
-
 .form-signin .form-control {
     position: relative;
     height: auto;
@@ -22,14 +10,44 @@ $primary-color: 'blue';
     font-size: 16px;
 }
 
-.form-signin input[type="password"] {
-    margin-bottom: 10px;
-    border-top-left-radius: 0;
-    border-top-right-radius: 0;
-}
-
 .form-signin {
-    max-width: 330px;
+    max-width: 430px;
     padding: 15px;
     margin: 0 auto;
+}
+
+.profile {
+    min-height: 430px;
+    display: inline-block;
+}
+
+.divider {
+    border-top: 1px solid rgba(0,0,0,0.1);
+}
+
+.emphasis {
+    border-top: 4px solid transparent;
+}
+
+.blended-in-text {
+    border: none;
+    background-color: #f5f5f5;
+    min-width: 400px;
+    box-shadow: none;
+}
+
+input:focus {
+    outline: 0 none;
+}
+
+.clearfix {
+    clear: both;
+}
+
+.no-top-margin {
+    margin-top: 0;
+}
+
+.margin-bottom {
+    margin-bottom: 10px;
 }

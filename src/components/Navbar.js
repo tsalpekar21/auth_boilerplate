@@ -1,15 +1,20 @@
 import React from 'react';
-import { logoutUser } from '../actions'
 import { browserHistory, Link } from 'react-router'
 
 class Navbar extends React.Component {
   constructor(props) {
     super(props) 
     this.onLogoutClick = this.onLogoutClick.bind(this)
+    this.onSuccessfulLogout = this.onSuccessfulLogout.bind(this)
   }
 
-  onLogoutClick() {
-    logoutUser(this.props.handleLogout, (err) => console.log(err))
+  onLogoutClick(e) {
+    e.preventDefault()
+    this.props.actionDispatcher.logoutUser(this.onSuccessfulLogout, (err) => console.log(err))
+  }
+
+  onSuccessfulLogout() {
+    this.props.handleAuthenticationLoss('/', 'You have successfully logged out.')
   }
 
   render() {

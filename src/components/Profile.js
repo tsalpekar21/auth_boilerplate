@@ -1,21 +1,17 @@
 import React from 'react'
-import { getUser, updateUser } from '../actions'
 
 class Profile extends React.Component {
   constructor(props) {
     super(props)
     this.onSuccessfulProfileLoad = this.onSuccessfulProfileLoad.bind(this)
-    this.onSuccessfulProfileSave = this.onSuccessfulProfileSave.bind(this)
     this.handleSubmit = this.handleSubmit.bind(this)
-    this.handleSuccessExit = this.handleSuccessExit.bind(this)
-    this.handleDangerExit = this.handleDangerExit.bind(this)
+    this.handleUpdateSuccess = this.handleUpdateSuccess.bind(this)
+    this.toggleEdit = this.toggleEdit.bind(this)
     this.id = 0
 
     this.state = {
       email: 'Loading...',
-      name: 'Loading...',
-      errors: [],
-      success: ''
+      name: 'Loading...'
     }
   }
 
@@ -28,14 +24,8 @@ class Profile extends React.Component {
   }
 
   componentDidMount() {
-    getUser(this.onSuccessfulProfileLoad, (err) => { this.setState({errors: err}) } )
+    this.props.actionDispatcher.getUser(this.onSuccessfulProfileLoad, this.props.handleErrors)
   }     
-
-  onSuccessfulProfileSave() {
-    this.setState({
-      success: 'Successfully saved your profile.'
-    }) 
-  }
 
   onSuccessfulProfileLoad(data) {
     let email = data.email
@@ -44,7 +34,8 @@ class Profile extends React.Component {
     this.initialName = name
     this.setState({
       email: email,
-      name: name
+      name: name,
+      edit: false
     })
   }
 
@@ -62,57 +53,99 @@ class Profile extends React.Component {
       this.id = this.id + 1
     }
 
-    if (errorArray.length > 0) this.setState({errors: errorArray})
-    else updateUser(creds, this.onSuccessfulProfileSave, (err) => { this.setState({errors: err}) })
+    if (errorArray.length > 0) this.props.handleErrors(errorArray)
+    else this.props.actionDispatcher.updateUser(creds, this.handleUpdateSuccess(creds), this.props.handleErrors)
   }
 
-  handleSuccessExit(_) {
-    this.setState({ success: '' })
+  handleUpdateSuccess(creds) {
+    this.initialName = creds.name
+    this.initialEmail = creds.email
+    return (data) => {
+      this.props.handleSuccess(data)
+    }
   }
 
-  handleDangerExit(_) {
-    this.setState({ errors: [] })
+  toggleEdit(e) {
+    e.preventDefault()
+    this.setState({
+      edit: !this.state.edit
+    })
   }
 
   render() {
-    let { errors, success } = this.state
-    return (
-      <div>
-        <form className="form-signin"> 
-          { errors.length > 0 && 
-            errors.map( e => (
-              <div className="alert alert-danger alert-dismissable" role="alert" key={e.id}> 
-                <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={this.handleDangerExit}>
-                  <span aria-hidden="true">&times;</span>
-                </button>
-                { e.message } 
-              </div>  
-            ))
-          }
+    let editFields = <div>
+                    <div className="col-sm-offset-3 col-xs-12 col-sm-6 text-center">
+                      <label htmlFor="inputEmail">Email address</label>
+                      <input type="email" ref="email" id="inputEmail" className="form-control text-center"  placeholder="Email address" required="" autoComplete="off" 
+                         onChange={ (e) => this.handleEmailChange(e)} 
+                         value={this.state.email} />
+                    </div>
+                    <div className="col-sm-offset-3 col-xs-12 col-sm-6">
+                      <label htmlFor="inputName">Name</label>
+                      <input type="text" ref="name" id="inputName" className="form-control text-center" placeholder="Name" required="" autoComplete="off" 
+                        onChange={(e) => this.handleNameChange(e)}
+                        value={this.state.name} />
+                    </div>             
+                </div>
 
-          { success && 
-            <div className="alert alert-success alert-dismissable" role="alert"> 
-              <button type="button" className="close" data-dismiss="alert" aria-label="Close" onClick={this.handleSuccessExit}>
-                <span aria-hidden="true">&times;</span>
-              </button>
-              { success } 
-            </div>  
-          }
-          
-          <h2 className="form-signin-heading">Profile</h2>
-          <label className="sr-only">Name</label>
-          <input type="text" ref="name" id="inputName" className="form-control" placeholder="Name" required="" autoComplete="off" 
-            onChange={(e) => this.handleNameChange(e)}
-            value={this.state.name} />
-          <label className="sr-only">Email address</label>
-          <input type="email" ref="email" id="inputEmail" className="form-control"  placeholder="Email address" required="" autoComplete="off" 
-            onChange={ (e) => this.handleEmailChange(e)} 
-            value={this.state.email} />
-          <button className="btn btn-lg btn-primary btn-block" onClick={this.handleSubmit} >Save</button>
-        </form>
+    let displayFields = <div>
+                    <div className="col-sm-offset-3 col-sm-6">
+                      <h4> Email </h4>
+                      <h4>{ this.state.email } </h4>
+                    </div>             
+                    <div className="col-sm-offset-3 col-sm-6 text-center">
+                      <h4> Name </h4>
+                      <h4> { this.state.name } </h4>
+                    </div>
+                    </div>
+
+    let displayButtonText = this.state.edit ? "Show" : "Edit"
+    return (
+      <div className="row">
+        <div className="col-md-offset-2 col-md-8 col-lg-offset-3 col-lg-6">
+          <form> 
+            <div className="well profile clearfix">
+                <div className="clearfix">
+                  <h2 className="pull-left no-top-margin"> Profile </h2>
+                  <div className="pull-right">
+                    <div className="btn-group pull-right" role="group" aria-label="Basic example">
+                      { this.state.edit ? <button type="button" className="btn btn-primary" onClick={this.handleSubmit}>Save</button> : null }
+                      <button type="button" className="btn btn-secondary" onClick={this.toggleEdit}>{displayButtonText}</button>
+                    </div>
+                  </div>
+                </div>
+                <div className="margin-bottom col-sm-12 text-center">
+                  { this.state.edit ? editFields : displayFields}
+                </div>
+                <div className="col-xs-12 divider text-center">
+                    <div className="col-xs-12 col-sm-6 emphasis">
+                        <h2><strong> 20,7K </strong></h2>                    
+                        <p><small>Followers</small></p>
+                        <button className="btn btn-success btn-block"> Dummy Button </button>
+                    </div>
+                    <div className="col-xs-12 col-sm-6 emphasis">
+                        <h2><strong>245</strong></h2>                    
+                        <p><small>Following</small></p>
+                        <button className="btn btn-info btn-block"> Dummy Button </button>
+                    </div>
+                </div>
+            </div>      
+          </form>
+        </div>
       </div>
     );
   }
 }
 
+
+          // <form classNameName="form-signin"> 
+          //   <h2 className="form-signin-heading">Profile</h2>
+          //   <label className="sr-only">Name</label>
+          //   <input type="text" ref="name" id="inputName" className="form-control" placeholder="Name" required="" autoComplete="off" 
+          //     onChange={(e) => this.handleNameChange(e)}
+          //     value={this.state.name} />
+          //   <label className="sr-only">Email address</label>
+
+          //   <button className="btn btn-lg btn-primary btn-block" onClick={this.handleSubmit} >Save</button>
+          // </form>
 export default Profile;

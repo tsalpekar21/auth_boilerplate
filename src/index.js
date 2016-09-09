@@ -17,8 +17,8 @@ ReactDOM.render(
     <Route path="/" component={App}>
       <IndexRoute component={HeroBanner} />
       <Route path='/signup' components={Signup} />
-      <Route path='/profile' component={Profile} />
       <Route path='/login' component={Login} />
+      <Route path='/profile' component={Profile} />
     </Route>
   </Router>,
   document.getElementById('root')

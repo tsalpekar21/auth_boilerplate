@@ -27,11 +27,11 @@ router.post('/users', (req, res) => {
     if (err) {
       console.log(err.errors)
       let formattedErrors = marshalErrors(err.errors)
-      res.status(400).json({ errors: formattedErrors })
+      res.status(400).json(formattedErrors)
     } else {
       let token = newUser.generateAuthToken()
       res.cookie('accessToken', token)
-      res.status(200).json({ token: token })
+      res.status(200).json({ token: token, message: "Successfully created user." })
     }
   })
 })
@@ -61,7 +61,7 @@ router.use((req, res, next) => {
         return res.status(403).send({ 
           type: 'expired',
           message: 'Failed to authenticate token.',
-           error: err 
+          error: err 
          })    
       } else {
         User.findById(decoded.id, (err, user) => {
