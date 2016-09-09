@@ -1,4 +1,4 @@
-Authentication Boilerplate
+#Authentication Boilerplate
 
 This app uses React, Node (Express) and MongoDB.
 
